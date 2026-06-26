@@ -781,6 +781,7 @@ export const Checkout: React.FC = () => {
     const { cart, placeOrder, currentUser, updateProfile, showToast } = useApp();
     const navigate = useNavigate();
     const [option, setOption] = useState<'delivery' | 'pickup'>('delivery');
+    const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'delivery_meet'>('paystack');
     const [submitting, setSubmitting] = useState(false);
     const [paystackLoaded, setPaystackLoaded] = useState(false);
     
@@ -813,6 +814,21 @@ export const Checkout: React.FC = () => {
     }, []);
 
     const handleCheckout = async () => {
+        if (paymentMethod === 'delivery_meet') {
+            setSubmitting(true);
+            try {
+                await placeOrder(option, deliveryFee);
+                showToast("Order placed successfully! Pay after meeting the vendor.", "success");
+                setSubmitting(false);
+                navigate('/buyer/orders');
+            } catch (err: any) {
+                console.error("Failed to place order:", err);
+                showToast("Failed to place order. Please try again.", "error");
+                setSubmitting(false);
+            }
+            return;
+        }
+
         const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
         
         if (!publicKey) {
@@ -970,6 +986,44 @@ export const Checkout: React.FC = () => {
                     </Card>
                 </div>
 
+                {/* Payment Method Option */}
+                <div className="space-y-4">
+                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Payment Option</h3>
+                    <div className="space-y-3">
+                        <div 
+                            onClick={() => setPaymentMethod('paystack')}
+                            className={`p-4 rounded-3xl border-2 transition-all cursor-pointer flex items-center gap-4 ${paymentMethod === 'paystack' ? 'bg-primary/5 border-primary shadow-sm' : 'bg-white dark:bg-darkSurface border-gray-100 dark:border-gray-800'}`}
+                        >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === 'paystack' ? 'bg-primary text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
+                                <i className="fa-solid fa-credit-card text-lg"></i>
+                            </div>
+                            <div className="flex-1">
+                                <p className={`text-sm font-black ${paymentMethod === 'paystack' ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>Online Payment</p>
+                                <p className="text-[10px] text-gray-400 font-bold mt-0.5">Pay instantly via Mobile Money / Cards using Paystack</p>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'paystack' ? 'border-primary bg-primary' : 'border-gray-200 dark:border-gray-700'}`}>
+                                {paymentMethod === 'paystack' && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
+                            </div>
+                        </div>
+
+                        <div 
+                            onClick={() => setPaymentMethod('delivery_meet')}
+                            className={`p-4 rounded-3xl border-2 transition-all cursor-pointer flex items-center gap-4 ${paymentMethod === 'delivery_meet' ? 'bg-primary/5 border-primary shadow-sm' : 'bg-white dark:bg-darkSurface border-gray-100 dark:border-gray-800'}`}
+                        >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${paymentMethod === 'delivery_meet' ? 'bg-primary text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
+                                <i className="fa-solid fa-handshake text-lg"></i>
+                            </div>
+                            <div className="flex-1">
+                                <p className={`text-sm font-black ${paymentMethod === 'delivery_meet' ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>Pay on Meeting</p>
+                                <p className="text-[10px] text-gray-400 font-bold mt-0.5">Meet the vendor on campus and pay upon receipt</p>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'delivery_meet' ? 'border-primary bg-primary' : 'border-gray-200 dark:border-gray-700'}`}>
+                                {paymentMethod === 'delivery_meet' && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Order Summary */}
                 <div className="space-y-4">
                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Order Summary</h3>
@@ -1000,7 +1054,7 @@ export const Checkout: React.FC = () => {
                     onClick={handleCheckout}
                     disabled={submitting || !currentUser?.address || isEditingAddress}
                 >
-                    {submitting ? 'Processing Order...' : `Confirm Order • ₵${total.toFixed(2)}`}
+                    {submitting ? 'Processing Order...' : (paymentMethod === 'delivery_meet' ? `Confirm & Pay on Meeting • ₵${total.toFixed(2)}` : `Pay with Paystack • ₵${total.toFixed(2)}`)}
                 </Button>
                 {!currentUser?.address && <p className="text-[10px] text-center text-red-500 font-black uppercase mt-2 tracking-widest animate-pulse">Set your address above to unlock checkout</p>}
             </div>
