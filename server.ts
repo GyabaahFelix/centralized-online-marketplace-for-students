@@ -105,6 +105,63 @@ async function startServer() {
         }
     });
 
+    // API Route to verify Paystack payment securely on the server
+    app.get('/api/paystack/verify/:reference', async (req, res) => {
+        const { reference } = req.params;
+
+        if (!reference) {
+            return res.status(400).json({ error: 'Transaction reference is required' });
+        }
+
+        const secretKey = process.env.PAYSTACK_SECRET_KEY;
+        if (!secretKey) {
+            console.error("PAYSTACK_SECRET_KEY is missing from environment variables.");
+            // Returning a helpful debug message for preview environments
+            return res.status(500).json({ 
+                error: 'Paystack Secret Key is not configured on the server. Please add PAYSTACK_SECRET_KEY in the application settings.' 
+            });
+        }
+
+        try {
+            const response = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${secretKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Paystack verification error response:", errorData);
+                return res.status(response.status).json({ 
+                    success: false, 
+                    error: errorData.message || 'Paystack verification request failed.' 
+                });
+            }
+
+            const data = await response.json();
+            
+            if (data.status && data.data && data.data.status === 'success') {
+                return res.json({ 
+                    success: true, 
+                    message: 'Payment verified successfully', 
+                    amount: data.data.amount / 100, // Return standard GHS unit
+                    reference: data.data.reference
+                });
+            } else {
+                return res.status(400).json({ 
+                    success: false, 
+                    error: data.message || 'Transaction was not successful or is still pending.' 
+                });
+            }
+
+        } catch (error: any) {
+            console.error('Error verifying Paystack payment:', error);
+            res.status(500).json({ error: error.message || 'Internal server error during verification' });
+        }
+    });
+
     // Vite Integration
     if (process.env.NODE_ENV !== 'production') {
         const vite = await createViteServer({

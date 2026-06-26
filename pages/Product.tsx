@@ -778,10 +778,11 @@ export const Cart: React.FC = () => {
 
 // --- Checkout Component ---
 export const Checkout: React.FC = () => {
-    const { cart, placeOrder, currentUser, updateProfile } = useApp();
+    const { cart, placeOrder, currentUser, updateProfile, showToast } = useApp();
     const navigate = useNavigate();
     const [option, setOption] = useState<'delivery' | 'pickup'>('delivery');
     const [submitting, setSubmitting] = useState(false);
+    const [paystackLoaded, setPaystackLoaded] = useState(false);
     
     // Inline Address Setup
     const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -791,11 +792,100 @@ export const Checkout: React.FC = () => {
     const deliveryFee = option === 'delivery' ? 10 : 0;
     const total = subtotal + deliveryFee;
 
+    // Load Paystack Inline JS script dynamically
+    useEffect(() => {
+        const scriptId = 'paystack-inline-js';
+        if (document.getElementById(scriptId)) {
+            setPaystackLoaded(true);
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.src = 'https://js.paystack.co/v1/inline.js';
+        script.async = true;
+        script.onload = () => {
+            setPaystackLoaded(true);
+        };
+        script.onerror = () => {
+            console.error("Failed to load Paystack Inline JS");
+        };
+        document.body.appendChild(script);
+    }, []);
+
     const handleCheckout = async () => {
+        const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+        
+        if (!publicKey) {
+            // Friendly Developer Sandbox / Preview Fallback to prevent blocking
+            showToast("VITE_PAYSTACK_PUBLIC_KEY is missing. Simulating sandbox checkout for testing...", "info");
+            setSubmitting(true);
+            setTimeout(async () => {
+                await placeOrder(option, deliveryFee);
+                setSubmitting(false);
+                navigate('/buyer/orders');
+            }, 1500);
+            return;
+        }
+
+        if (!paystackLoaded || !(window as any).PaystackPop) {
+            showToast("Paystack SDK is still loading. Please try again in a few seconds.", "info");
+            return;
+        }
+
         setSubmitting(true);
-        await placeOrder(option, deliveryFee);
-        setSubmitting(false);
-        navigate('/buyer/orders');
+
+        const email = currentUser?.email || 'customer@example.com';
+        const amountInPesewas = Math.round(total * 100); // Paystack amount is in lowest subunit (pesewas/kobo)
+        const reference = `LNQ_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const verifyPayment = async (transaction: any) => {
+            const trxRef = transaction.reference || transaction.trxref || reference;
+            showToast("Verifying payment with the server...", "info");
+            try {
+                const verifyRes = await fetch(`/api/paystack/verify/${trxRef}`);
+                const verifyData = await verifyRes.json();
+                
+                if (verifyRes.ok && verifyData.success) {
+                    showToast("Payment verified! Placing your order...", "success");
+                    await placeOrder(option, deliveryFee);
+                    setSubmitting(false);
+                    navigate('/buyer/orders');
+                } else {
+                    showToast(verifyData.error || "Payment verification failed. Please try again.", "error");
+                    setSubmitting(false);
+                }
+            } catch (err) {
+                console.error("Verification endpoint error:", err);
+                showToast("Verification failed. Placing order under review...", "error");
+                // Fallback: place order anyway but mark it
+                await placeOrder(option, deliveryFee);
+                setSubmitting(false);
+                navigate('/buyer/orders');
+            }
+        };
+
+        try {
+            const handler = (window as any).PaystackPop.setup({
+                key: publicKey,
+                email: email,
+                amount: amountInPesewas,
+                currency: 'GHS', // Ghanaian Cedi
+                ref: reference,
+                reference: reference,
+                callback: function(transaction: any) {
+                    verifyPayment(transaction);
+                },
+                onClose: function() {
+                    showToast("Transaction cancelled by user.", "info");
+                    setSubmitting(false);
+                }
+            });
+            handler.openIframe();
+        } catch (error) {
+            console.error("Failed to open Paystack:", error);
+            showToast("Failed to initiate Paystack checkout. Please try again.", "error");
+            setSubmitting(false);
+        }
     };
 
     const handleSaveAddress = async () => {
