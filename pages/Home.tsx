@@ -204,7 +204,7 @@ export const BuyerDashboard: React.FC = () => {
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all overflow-hidden border-2 ${selectedCat === cat.name ? 'border-primary ring-4 ring-primary/10 scale-105 shadow-lg' : 'border-transparent bg-white/60 dark:bg-darkSurface text-gray-500 shadow-sm group-hover:scale-105'}`}>
                         {cat.image ? <img src={cat.image} className="w-full h-full object-cover" /> : <i className={`fa-solid fa-${cat.icon} text-xl`}></i>}
                     </div>
-                    <span className={`text-[11px] font-black uppercase transition-colors ${selectedCat === cat.name ? 'text-primary' : 'text-gray-500'}`}>{cat.name}</span>
+                    <span className={`text-[11px] font-black uppercase transition-colors text-center ${selectedCat === cat.name ? 'text-primary' : 'text-gray-500'}`}>{cat.name}</span>
                 </div>
             ))}
         </div>
