@@ -1,0 +1,20 @@
+
+{
+  "name": "LYNQED - Campus Marketplace",
+  "short_name": "LYNQED",
+  "description": "Where Buyers and Sellers Get LYNQED.",
+  "start_url": "/#/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#a855f7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://suschmjoogvoufhozbet.supabase.co/storage/v1/object/public/lynqed-assets/Lynqed_Logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle", "education"]
+}

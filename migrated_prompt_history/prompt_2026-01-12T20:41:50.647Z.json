@@ -1,0 +1,64 @@
+[
+  {
+    "id": 7,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "why is the app failing to reload?",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768250371,
+      "nanos": 340000000
+    }
+  },
+  {
+    "id": 8,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": ""
+    },
+    "createdTimestamp": {
+      "seconds": 1768250371,
+      "nanos": 340000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768250373,
+      "nanos": 560000000
+    }
+  },
+  {
+    "id": 9,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "heyya.\nLet's discuss something.\nAre you in?",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768250486,
+      "nanos": 515000000
+    }
+  },
+  {
+    "id": 10,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": ""
+    },
+    "createdTimestamp": {
+      "seconds": 1768250486,
+      "nanos": 515000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768250488,
+      "nanos": 147000000
+    }
+  }
+]

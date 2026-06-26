@@ -1,0 +1,162 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with roles, preferences, and details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the user." },
+        "name": { "type": "string", "description": "Full name of the user." },
+        "email": { "type": "string", "description": "Email address of the user." },
+        "avatarUrl": { "type": "string", "description": "URL to the user's profile avatar." },
+        "roles": { "type": "array", "description": "List of roles assigned to the user." },
+        "defaultLocation": { "type": "string", "description": "Default campus location or address." },
+        "phoneNumber": { "type": "string", "description": "Contact phone number." },
+        "isBanned": { "type": "boolean", "description": "Whether the user's account is banned." },
+        "push_token": { "type": "string", "description": "Firebase Cloud Messaging push token." }
+      },
+      "required": ["id", "name", "email", "roles"]
+    },
+    "Product": {
+      "title": "Product Listing",
+      "description": "Vendor product listing details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier of the product." },
+        "vendorId": { "type": "string", "description": "ID of the vendor selling the product." },
+        "title": { "type": "string", "description": "Title of the product listing." },
+        "description": { "type": "string", "description": "Detailed description of the product." },
+        "price": { "type": "number", "description": "Listing price of the product." },
+        "currency": { "type": "string", "description": "Currency code like GHS, USD." },
+        "category": { "type": "string", "description": "Category name for the listing." },
+        "images": { "type": "array", "description": "URLs of listing product images." },
+        "contactPhone": { "type": "string", "description": "Vendor phone number to contact for this product." },
+        "stock": { "type": "number", "description": "Available stock quantity." },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Approval status of the listing." },
+        "location": { "type": "string", "description": "Item pickup or vendor location." },
+        "campus": { "type": "string", "enum": ["UG", "UPSA"], "description": "Associated campus identifier." },
+        "rating": { "type": "number", "description": "Average rating calculated from user reviews." },
+        "reviewCount": { "type": "number", "description": "Count of reviews submitted." },
+        "isTrending": { "type": "boolean", "description": "Toggled by admins for popular items." }
+      },
+      "required": ["id", "vendorId", "title", "price", "category", "stock", "status"]
+    },
+    "Vendor": {
+      "title": "Vendor Profile",
+      "description": "Details of student entrepreneur's store profile.",
+      "type": "object",
+      "properties": {
+        "vendorId": { "type": "string", "description": "Identifier of the vendor store profile." },
+        "userId": { "type": "string", "description": "Owner userId of the vendor store." },
+        "storeName": { "type": "string", "description": "Registered brand/store name." },
+        "storeDescription": { "type": "string", "description": "Short bio/about description." },
+        "storeAvatarUrl": { "type": "string", "description": "Store branding logo/avatar url." },
+        "location": { "type": "string", "description": "Specific location of the store on campus." },
+        "campus": { "type": "string", "enum": ["UG", "UPSA"], "description": "Primary campus where the store operates." },
+        "isApproved": { "type": "boolean", "description": "Whether the vendor store is approved by administrators." },
+        "rating": { "type": "number", "description": "Average review rating of the store." },
+        "contactPhone": { "type": "string", "description": "Customer care and vendor contact phone." }
+      },
+      "required": ["vendorId", "userId", "storeName", "location", "isApproved"]
+    },
+    "Courier": {
+      "title": "Courier Application",
+      "description": "Application and operations profile for Campus Dispatchers/Couriers.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique id matching application record." },
+        "userId": { "type": "string", "description": "Primary user ID of dispatcher user." },
+        "fullName": { "type": "string", "description": "Full legal name matching national ID." },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "suspended"], "description": "Review status of courier." },
+        "vehicleType": { "type": "string", "description": "Courier dispatch vehicle (Walking, Bicycle, Motorbike, etc)." },
+        "onlineStatus": { "type": "boolean", "description": "Whether courier is currently active and online." },
+        "currentLat": { "type": "number", "description": "Dynamic current Latitude." },
+        "currentLng": { "type": "number", "description": "Dynamic current Longitude." },
+        "payoutMethod": { "type": "string", "description": "Preferred mobile money or payment platform info." }
+      },
+      "required": ["id", "userId", "fullName", "status", "vehicleType"]
+    },
+    "Order": {
+      "title": "Marketplace Order",
+      "description": "Multi-item marketplace transaction document.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique transaction identity." },
+        "buyerId": { "type": "string", "description": "User id of the catalog buyer user." },
+        "vendorId": { "type": "string", "description": "Store vendorId being purchased from." },
+        "courierId": { "type": "string", "description": "User ID of courier dispatcher assigned." },
+        "total": { "type": "number", "description": "Invoice grand total in local currency." },
+        "deliveryFee": { "type": "number", "description": "Courier delivery fee calculated dynamically." },
+        "status": { "type": "string", "description": "Comprehensive order fulfillment state." },
+        "deliveryOption": { "type": "string", "enum": ["delivery", "pickup"], "description": "Choice of courier express delivery vs self-pickup." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["id", "buyerId", "vendorId", "total", "status", "deliveryOption"]
+    },
+    "Notification": {
+      "title": "Push and In-App notification",
+      "description": "Actionable user notifications.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification document id." },
+        "userId": { "type": "string", "description": "Target user ID who should receive this notification." },
+        "targetRole": { "type": "string", "description": "Target dispatcher/courier/vendor user role." },
+        "targetScope": { "type": "string", "enum": ["individual", "role", "global"], "description": "Fm broadcast and delivery target scope." },
+        "type": { "type": "string", "description": "Notification context type." },
+        "title": { "type": "string", "description": "Audible alert heading alert title." },
+        "message": { "type": "string", "description": "Body message snippet detail." },
+        "relatedId": { "type": "string", "description": "Correlated OrderId/ProductId context." },
+        "priority": { "type": "string", "enum": ["low", "normal", "high", "critical"], "description": "Urgency rating." },
+        "isRead": { "type": "boolean", "description": "Whether the user already viewed message." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Notification delivery timestamp." }
+      },
+      "required": ["id", "targetScope", "type", "title", "message", "priority", "isRead"]
+    },
+    "Review": {
+      "title": "Product Review",
+      "description": "Star rating and comments made by buyers on items.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productId": { "type": "string" },
+        "vendorId": { "type": "string" },
+        "userId": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "images": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "vendorId", "userId", "rating", "comment", "images"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of all system user profiles."
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of products listed by vendors."
+    },
+    "/vendors/{vendorId}": {
+      "schema": "Vendor",
+      "description": "Store configurations for verified student vendors."
+    },
+    "/couriers/{courierId}": {
+      "schema": "Courier",
+      "description": "Courier dispatchers and online courier vehicle status records."
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Campus marketplace commerce transaction documents."
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Event alerts and FCM background queues."
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Vendor product quality feedbacks."
+    }
+  }
+}

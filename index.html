@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LYNQED - Campus Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+      (function() {
+        const theme = localStorage.getItem('lynqed_theme_last') || 'system';
+        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#a855f7', // Brand Purple
+              primaryDark: '#9333ea', 
+              primaryLight: '#c084fc', 
+              accent: '#f472b6', // Vibrant Pink
+              secondary: '#fb7185', // Rose
+              background: '#ffffff',
+              darkBg: '#0f172a',
+              darkSurface: '#1e293b',
+              surface: '#ffffff',
+              danger: '#ef4444',
+              success: '#10b981',
+              warning: '#f59e0b',
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              display: ['Poppins', 'system-ui', 'sans-serif'],
+            },
+            boxShadow: {
+              'soft': '0 10px 40px -10px rgba(168, 85, 247, 0.15)',
+              'glow': '0 0 25px rgba(168, 85, 247, 0.35)',
+              'card': '0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.03)',
+              'float': '0 25px 50px -12px rgba(168, 85, 247, 0.15)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.6s ease-out',
+              'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+              'bounce-slight': 'bounceSlight 3s infinite ease-in-out',
+              'blob': 'blob 10s infinite',
+              'scroll': 'scroll 20s linear infinite',
+              'gradient-slow': 'gradientMove 15s ease infinite',
+            },
+            keyframes: {
+              fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+              slideUp: { '0%': { transform: 'translateY(30px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+              bounceSlight: { '0%, 100%': { transform: 'translateY(-5%)' }, '50%': { transform: 'translateY(0)' } },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(50px, -70px) scale(1.1)' },
+                '66%': { transform: 'translate(-30px, 40px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              },
+              scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
+              gradientMove: { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } }
+            }
+          },
+        },
+      };
+    </script>
+    <style>
+      ::-webkit-scrollbar { width: 0px; background: transparent; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      body {
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.4s ease;
+        /* RADIANT AURORA - LIGHT THEME ONLY */
+        background-color: #fffafc;
+        background-image: 
+          radial-gradient(at 0% 0%, #faf5ff 0px, transparent 55%), 
+          radial-gradient(at 100% 0%, #fff1f2 0px, transparent 55%),
+          radial-gradient(at 100% 100%, #f5f3ff 0px, transparent 55%),
+          radial-gradient(at 0% 100%, #fdf2f8 0px, transparent 55%);
+        background-attachment: fixed;
+        background-size: 200% 200%;
+        animation: gradientMove 20s ease infinite;
+      }
+      /* TOTALLY DARK THEME - NO GRADIENTS */
+      .dark body {
+        background-color: #0f172a !important;
+        background-image: none !important;
+        animation: none !important;
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .dark .glass {
+        background: rgba(15, 23, 42, 0.85);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+      .dark .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .leaflet-container { background: #f5f3ff; font-family: 'Inter', sans-serif; }
+      .dark .leaflet-container { background: #1e293b; }
+      .dark .leaflet-tile-pane { filter: grayscale(100%) invert(90%) contrast(90%); }
+      .pulse-ring::before {
+        content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%;
+        animation: pulse 2s infinite; border: 2px solid currentColor;
+      }
+      @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "vite": "https://aistudiocdn.com/vite@^7.2.6",
+        "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.86.0",
+        "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+      }
+    }
+    </script>
+  </head>
+  <body class="antialiased selection:bg-primary/20 selection:text-primary">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

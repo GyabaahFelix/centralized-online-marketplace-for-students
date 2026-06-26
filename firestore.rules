@@ -1,0 +1,311 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default Deny safety net (MUST run first)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE SECURITY PRIMITIVES ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || 
+        request.auth.token.email == 'felixic360@gmail.com'
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\\\-]+$');
+    }
+
+    // --- SCHEMA VALIDATION BLUEPRINTS ---
+
+    function isValidUser(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 150 &&
+             data.roles is list && data.roles.size() >= 1 && data.roles.size() <= 5 &&
+             (!data.keys().hasAny(['avatarUrl']) || (data.avatarUrl is string && data.avatarUrl.size() <= 1000)) &&
+             (!data.keys().hasAny(['defaultLocation']) || (data.defaultLocation is string && data.defaultLocation.size() <= 200)) &&
+             (!data.keys().hasAny(['phoneNumber']) || (data.phoneNumber is string && data.phoneNumber.size() <= 50)) &&
+             (!data.keys().hasAny(['isBanned']) || data.isBanned is bool) &&
+             (!data.keys().hasAny(['push_token']) || (data.push_token is string && data.push_token.size() <= 500));
+    }
+
+    function isValidProduct(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.vendorId is string && data.vendorId.size() <= 128 &&
+             data.title is string && data.title.size() <= 150 &&
+             data.price is number && data.price >= 0 && data.price <= 100000 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.stock is number && data.stock >= 0 &&
+             data.status is string && (data.status == 'pending' || data.status == 'approved' || data.status == 'rejected') &&
+             (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 2000)) &&
+             (!data.keys().hasAny(['currency']) || (data.currency is string && data.currency.size() <= 3)) &&
+             (!data.keys().hasAny(['images']) || (data.images is list && data.images.size() <= 10)) &&
+             (!data.keys().hasAny(['contactPhone']) || (data.contactPhone is string && data.contactPhone.size() <= 50)) &&
+             (!data.keys().hasAny(['location']) || (data.location is string && data.location.size() <= 200)) &&
+             (!data.keys().hasAny(['campus']) || (data.campus == 'UG' || data.campus == 'UPSA')) &&
+             (!data.keys().hasAny(['rating']) || (data.rating is number)) &&
+             (!data.keys().hasAny(['reviewCount']) || (data.reviewCount is number)) &&
+             (!data.keys().hasAny(['isTrending']) || data.isTrending is bool);
+    }
+
+    function isValidVendor(data) {
+      return data.vendorId is string && data.vendorId.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.storeName is string && data.storeName.size() <= 150 &&
+             data.location is string && data.location.size() <= 250 &&
+             data.isApproved is bool &&
+             (!data.keys().hasAny(['storeDescription']) || (data.storeDescription is string && data.storeDescription.size() <= 1000)) &&
+             (!data.keys().hasAny(['storeAvatarUrl']) || (data.storeAvatarUrl is string && data.storeAvatarUrl.size() <= 1000)) &&
+             (!data.keys().hasAny(['campus']) || (data.campus == 'UG' || data.campus == 'UPSA')) &&
+             (!data.keys().hasAny(['rating']) || (data.rating is number)) &&
+             (!data.keys().hasAny(['contactPhone']) || (data.contactPhone is string && data.contactPhone.size() <= 50));
+    }
+
+    function isValidCourier(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.fullName is string && data.fullName.size() <= 100 &&
+             data.status is string && (data.status == 'pending' || data.status == 'approved' || data.status == 'rejected' || data.status == 'suspended') &&
+             data.vehicleType is string && data.vehicleType.size() <= 100 &&
+             (!data.keys().hasAny(['onlineStatus']) || data.onlineStatus is bool) &&
+             (!data.keys().hasAny(['currentLat']) || data.currentLat is number) &&
+             (!data.keys().hasAny(['currentLng']) || data.currentLng is number) &&
+             (!data.keys().hasAny(['payoutMethod']) || (data.payoutMethod is string && data.payoutMethod.size() <= 200));
+    }
+
+    function isValidOrder(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.buyerId is string && data.buyerId.size() <= 128 &&
+             data.vendorId is string && data.vendorId.size() <= 128 &&
+             data.total is number && data.total >= 0 &&
+             data.status is string && data.status.size() <= 50 &&
+             data.deliveryOption is string && (data.deliveryOption == 'delivery' || data.deliveryOption == 'pickup') &&
+             (!data.keys().hasAny(['courierId']) || (data.courierId is string && data.courierId.size() <= 128)) &&
+             (!data.keys().hasAny(['deliveryFee']) || (data.deliveryFee is number && data.deliveryFee >= 0)) &&
+             (!data.keys().hasAny(['createdAt']) || (data.createdAt is string || data.createdAt is timestamp));
+    }
+
+    function isValidNotification(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             (!data.keys().hasAny(['userId']) || (data.userId is string && data.userId.size() <= 128)) &&
+             (!data.keys().hasAny(['targetRole']) || (data.targetRole is string && data.targetRole.size() <= 50)) &&
+             data.targetScope is string && (data.targetScope == 'individual' || data.targetScope == 'role' || data.targetScope == 'global') &&
+             data.type is string && data.type.size() <= 50 &&
+             data.title is string && data.title.size() <= 150 &&
+             data.message is string && data.message.size() <= 1000 &&
+             (!data.keys().hasAny(['relatedId']) || (data.relatedId is string && data.relatedId.size() <= 128)) &&
+             data.priority is string && (data.priority == 'low' || data.priority == 'normal' || data.priority == 'high' || data.priority == 'critical') &&
+             data.isRead is bool &&
+             (!data.keys().hasAny(['createdAt']) || (data.createdAt is string || data.createdAt is timestamp));
+    }
+
+    function isValidReview(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.productId is string && data.productId.size() <= 128 &&
+             data.vendorId is string && data.vendorId.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 1000 &&
+             data.images is list && data.images.size() <= 10 &&
+             (!data.keys().hasAny(['createdAt']) || (data.createdAt is string || data.createdAt is timestamp));
+    }
+
+    // --- COLLECTION ALLOW RULES ---
+
+    // 1. Users Profile Collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      
+      allow create: if isVerified() && isOwner(userId) && isValidId(userId) &&
+                       request.resource.data.keys().hasAll(['id', 'name', 'email', 'roles']) &&
+                       request.resource.data.keys().size() <= 9 &&
+                       isValidUser(request.resource.data) &&
+                       !request.resource.data.roles.hasAny(['admin']) && // Prevent self-promoting to admin
+                       (!request.resource.data.keys().hasAny(['isBanned']) || request.resource.data.isBanned == false);
+                       
+      allow update: if isVerified() && (isOwner(userId) || isAdmin()) &&
+                       isValidUser(request.resource.data) && (
+                         isAdmin() || (
+                           // Prevent self-privilege modifications
+                           request.resource.data.roles == resource.data.roles &&
+                           (!request.resource.data.keys().hasAny(['isBanned']) || request.resource.data.isBanned == resource.data.isBanned) &&
+                           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'avatarUrl', 'defaultLocation', 'phoneNumber', 'push_token'])
+                         )
+                       );
+      allow delete: if isAdmin();
+    }
+
+    // 2. Product Listings
+    match /products/{productId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      
+      allow create: if isVerified() && isValidId(productId) &&
+                       request.resource.data.keys().hasAll(['id', 'vendorId', 'title', 'price', 'category', 'stock', 'status']) &&
+                       isValidProduct(request.resource.data) &&
+                       get(/databases/$(database)/documents/vendors/$(request.resource.data.vendorId)).data.userId == request.auth.uid;
+                       
+      allow update: if isVerified() && isValidProduct(request.resource.data) && (
+                       isAdmin() || (
+                         get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.userId == request.auth.uid &&
+                         request.resource.data.status == resource.data.status &&
+                         (!request.resource.data.keys().hasAny(['isTrending']) || request.resource.data.isTrending == resource.data.isTrending) &&
+                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'price', 'images', 'stock', 'contactPhone', 'location', 'campus'])
+                       )
+                     );
+      allow delete: if isVerified() && (
+                       isAdmin() || 
+                       get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.userId == request.auth.uid
+                     );
+    }
+
+    // 3. Vendor Stores
+    match /vendors/{vendorId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      
+      allow create: if isVerified() && isValidId(vendorId) &&
+                       request.resource.data.keys().hasAll(['vendorId', 'userId', 'storeName', 'location', 'isApproved']) &&
+                       isValidVendor(request.resource.data) &&
+                       isOwner(request.resource.data.userId) &&
+                       request.resource.data.isApproved == false;
+                       
+      allow update: if isVerified() && isValidVendor(request.resource.data) && (
+                       isAdmin() || (
+                         isOwner(resource.data.userId) &&
+                         request.resource.data.isApproved == resource.data.isApproved && // Prevent self-approval
+                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['storeName', 'storeDescription', 'storeAvatarUrl', 'location', 'contactPhone', 'campus'])
+                       )
+                     );
+      allow delete: if isAdmin();
+    }
+
+    // 4. Couriers Application / Profile
+    match /couriers/{courierId} {
+      allow get: if isSignedIn() && (isOwner(resource.data.userId) || isAdmin());
+      allow list: if isAdmin();
+      
+      allow create: if isVerified() && isValidId(courierId) &&
+                       request.resource.data.keys().hasAll(['id', 'userId', 'fullName', 'status', 'vehicleType']) &&
+                       isValidCourier(request.resource.data) &&
+                       isOwner(request.resource.data.userId) &&
+                       request.resource.data.status == 'pending';
+                       
+      allow update: if isVerified() && isValidCourier(request.resource.data) && (
+                       isAdmin() || (
+                         isOwner(resource.data.userId) &&
+                         request.resource.data.status == resource.data.status && // Prevent self-approval
+                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['onlineStatus', 'currentLat', 'currentLng', 'payoutMethod', 'vehicleType'])
+                       )
+                     );
+      allow delete: if isAdmin();
+    }
+
+    // 5. Orders Collection
+    match /orders/{orderId} {
+      allow get: if isSignedIn() && (
+                    isOwner(resource.data.buyerId) || 
+                    get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.userId == request.auth.uid || 
+                    resource.data.courierId == request.auth.uid || 
+                    isAdmin()
+                  );
+      allow list: if isSignedIn() && (
+                    resource.data.buyerId == request.auth.uid || 
+                    get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.userId == request.auth.uid || 
+                    resource.data.courierId == request.auth.uid || 
+                    isAdmin()
+                  );
+      
+      allow create: if isVerified() && isValidId(orderId) &&
+                       request.resource.data.keys().hasAll(['id', 'buyerId', 'vendorId', 'total', 'status', 'deliveryOption']) &&
+                       isValidOrder(request.resource.data) &&
+                       isOwner(request.resource.data.buyerId) &&
+                       request.resource.data.status == 'placed';
+                       
+      allow update: if isVerified() && isValidOrder(request.resource.data) && (
+                       isAdmin() || (
+                         // Case A: Vendor status updates
+                         get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.userId == request.auth.uid &&
+                         request.resource.data.buyerId == resource.data.buyerId &&
+                         request.resource.data.vendorId == resource.data.vendorId &&
+                         request.resource.data.total == resource.data.total &&
+                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+                       ) || (
+                         // Case B: Courier claims and status updates
+                         (resource.data.courierId == request.auth.uid || !resource.data.keys().hasAny(['courierId'])) &&
+                         request.resource.data.buyerId == resource.data.buyerId &&
+                         request.resource.data.vendorId == resource.data.vendorId &&
+                         request.resource.data.total == resource.data.total &&
+                         (
+                           // Courier assignment
+                           (!resource.data.keys().hasAny(['courierId']) && request.resource.data.courierId == request.auth.uid && request.resource.data.status == 'courier_assigned') ||
+                           // Courier operational updates
+                           (resource.data.courierId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+                         )
+                       ) || (
+                         // Case C: Buyer cancels
+                         isOwner(resource.data.buyerId) &&
+                         request.resource.data.status == 'cancelled' &&
+                         resource.data.status == 'placed' &&
+                         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+                       )
+                     );
+      allow delete: if isAdmin();
+    }
+
+    // 6. Notifications Collection
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn() && (isOwner(resource.data.userId) || resource.data.targetScope == 'global' || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.targetScope == 'global' || isAdmin());
+      
+      allow create: if isVerified() && isValidId(notificationId) && isValidNotification(request.resource.data);
+      allow update: if isVerified() && isOwner(resource.data.userId) &&
+                       isValidNotification(request.resource.data) &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+      allow delete: if isVerified() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    // 7. Reviews Collection
+    match /reviews/{reviewId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      
+      allow create: if isVerified() && isValidId(reviewId) &&
+                       request.resource.data.keys().hasAll(['id', 'productId', 'vendorId', 'userId', 'rating', 'comment', 'images']) &&
+                       isValidReview(request.resource.data) &&
+                       isOwner(request.resource.data.userId);
+                       
+      allow update: if isVerified() && isOwner(resource.data.userId) &&
+                       isValidReview(request.resource.data) &&
+                       request.resource.data.productId == resource.data.productId &&
+                       request.resource.data.vendorId == resource.data.vendorId &&
+                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'comment', 'images']);
+      allow delete: if isVerified() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    // 8. Admins Collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if false; 
+    }
+  }
+}

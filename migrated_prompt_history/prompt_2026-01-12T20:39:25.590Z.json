@@ -1,0 +1,95 @@
+[
+  {
+    "id": 0,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "Warning\n\"Failed to load the app. Try reloading it.\"\nI've refreshed millions of times yet nothing is rendering.\nKindly ensure my app renders properly as before",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768249000,
+      "nanos": 823000000
+    }
+  },
+  {
+    "id": 1,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": ""
+    },
+    "createdTimestamp": {
+      "seconds": 1768249000,
+      "nanos": 823000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768249002,
+      "nanos": 662000000
+    }
+  },
+  {
+    "id": 2,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "modify the codes",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768249011,
+      "nanos": 331000000
+    }
+  },
+  {
+    "id": 3,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": ""
+    },
+    "createdTimestamp": {
+      "seconds": 1768249011,
+      "nanos": 331000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768249012,
+      "nanos": 646000000
+    }
+  },
+  {
+    "id": 5,
+    "author": "user",
+    "payload": {
+      "type": "text",
+      "text": "why is the app failing to reload?",
+      "files": [],
+      "fileUploads": [],
+      "cMarkNode": {}
+    },
+    "createdTimestamp": {
+      "seconds": 1768250341,
+      "nanos": 21000000
+    }
+  },
+  {
+    "id": 6,
+    "author": "model",
+    "payload": {
+      "type": "thinking",
+      "text": ""
+    },
+    "createdTimestamp": {
+      "seconds": 1768250341,
+      "nanos": 21000000
+    },
+    "doneTimestamp": {
+      "seconds": 1768250343,
+      "nanos": 83000000
+    }
+  }
+]
