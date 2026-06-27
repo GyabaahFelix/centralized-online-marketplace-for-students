@@ -72,8 +72,8 @@
               'gradient-slow': 'gradientMove 15s ease infinite',
             },
             keyframes: {
-              fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-              slideUp: { '0%': { transform: 'translateY(30px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+              fadeIn: { '0%': { opacity: '1' }, '100%': { opacity: '1' } },
+              slideUp: { '0%': { transform: 'translateY(10px)' }, '100%': { transform: 'translateY(0)' } },
               bounceSlight: { '0%, 100%': { transform: 'translateY(-5%)' }, '50%': { transform: 'translateY(0)' } },
               blob: {
                 '0%': { transform: 'translate(0px, 0px) scale(1)' },
@@ -93,7 +93,6 @@
       .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       body {
         -webkit-tap-highlight-color: transparent;
-        transition: background-color 0.4s ease;
         /* RADIANT AURORA - LIGHT THEME ONLY */
         background-color: #fffafc;
         background-image: 
