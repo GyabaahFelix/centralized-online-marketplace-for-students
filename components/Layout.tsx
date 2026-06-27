@@ -5,6 +5,7 @@ import { useApp } from '../context';
 import { Toast, Avatar } from './UI';
 import { LOGO_URL } from '../constants';
 import { NotificationCenter } from './Notifications';
+import { PWAInstallPrompt } from './PWAInstallPrompt';
 
 export const BottomNav: React.FC = () => {
   const { currentRole, cart, unreadCount } = useApp();
@@ -285,6 +286,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {!isWelcome && !isSearchPage && <Navbar />}
       <main className="flex-grow flex flex-col pb-20 md:pb-0">{children}</main>
       <BottomNav />
+      <PWAInstallPrompt />
     </div>
   );
 };
