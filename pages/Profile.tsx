@@ -308,8 +308,27 @@ const SettingsList: React.FC = () => {
             <ActionItem icon="headset" label="Help Center" onClick={() => navigate('/faq')} />
 
             {showThemeModal && (
-                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center animate-fade-in px-4">
-                    <Card className="p-8 w-full max-sm rounded-[3rem] animate-slide-up bg-white dark:bg-darkSurface"><div className="flex justify-between items-center mb-8"><h3 className="text-xl font-black dark:text-white font-display">Appearance</h3><button onClick={() => setShowThemeModal(false)} className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400"><i className="fa-solid fa-xmark"></i></button></div><div className="space-y-3">{['light', 'dark', 'system'].map(mode => <div key={mode} onClick={() => { updateTheme(mode as any); setShowThemeModal(false); }} className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all cursor-pointer ${theme === mode ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-gray-100 dark:border-gray-800 text-gray-400'}`}><span className="font-black text-sm capitalize">{mode} Mode</span>{theme === mode && <i className="fa-solid fa-circle-check text-xl"></i>}</div>)}</div></Card>
+                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-fade-in px-4 py-6">
+                    <Card className="p-6 sm:p-8 w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-[2.5rem] sm:rounded-[3rem] animate-scale-up bg-white dark:bg-darkSurface shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-black dark:text-white font-display">Appearance</h3>
+                            <button onClick={() => setShowThemeModal(false)} className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <i className="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {['light', 'dark', 'system'].map(mode => (
+                                <div 
+                                    key={mode} 
+                                    onClick={() => { updateTheme(mode as any); setShowThemeModal(false); }} 
+                                    className={`flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer ${theme === mode ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-gray-100 dark:border-gray-800 text-gray-400 hover:border-primary/20'}`}
+                                >
+                                    <span className="font-black text-sm capitalize">{mode} Mode</span>
+                                    {theme === mode && <i className="fa-solid fa-circle-check text-xl text-primary"></i>}
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
                 </div>
             )}
         </div>

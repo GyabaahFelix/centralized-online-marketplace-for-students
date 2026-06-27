@@ -274,7 +274,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="min-h-screen relative flex flex-col font-sans text-slate-800 dark:text-slate-200 overflow-x-hidden">
       {/* RADIANT DECORATIVE BLOBS (Light Mode Only) */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden dark:hidden">
+      <div className="fixed inset-0 pointer-events-none z-[-10] overflow-hidden dark:hidden">
           <div className="absolute top-[-15%] left-[-15%] w-[70vw] h-[70vw] bg-pink-200/50 rounded-full blur-[140px] animate-blob"></div>
           <div className="absolute bottom-[-15%] right-[-15%] w-[80vw] h-[80vw] bg-indigo-200/50 rounded-full blur-[160px] animate-blob animation-delay-2000"></div>
           <div className="absolute top-[35%] right-[5%] w-[45vw] h-[45vw] bg-purple-100/40 rounded-full blur-[120px] animate-blob animation-delay-4000"></div>
@@ -283,7 +283,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       
       <Toast toast={toast} onClose={hideToast} />
       {!isWelcome && !isSearchPage && <Navbar />}
-      <main className="flex-grow flex flex-col pb-20 md:pb-0 z-10">{children}</main>
+      <main className="flex-grow flex flex-col pb-20 md:pb-0">{children}</main>
       <BottomNav />
     </div>
   );
