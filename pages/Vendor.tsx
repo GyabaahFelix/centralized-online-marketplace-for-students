@@ -129,7 +129,7 @@ export const VendorDashboard: React.FC = () => {
   }, [orders, vendorId]);
 
   return (
-    <div className="p-4 min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in pb-safe">
+    <div className="p-4 min-h-screen bg-transparent pb-24 animate-fade-in pb-safe">
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-display">Merchant Center</h1>
             <Button size="sm" onClick={() => navigate('/vendor/products/new')}>+ Add Product</Button>
@@ -190,7 +190,7 @@ export const VendorProducts: React.FC = () => {
     const myProducts = products.filter(p => p.vendorId === currentVendor?.vendorId);
 
     return (
-        <div className="p-4 min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in pb-safe">
+        <div className="p-4 min-h-screen bg-transparent pb-24 animate-fade-in pb-safe">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-xl font-black text-gray-900 dark:text-white font-display uppercase tracking-tight">Active Listings</h1>
                 <Button size="sm" onClick={() => navigate('/vendor/products/new')}>Add New</Button>
@@ -269,7 +269,7 @@ export const VendorOrders: React.FC = () => {
     };
 
     return (
-        <div className="p-4 min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in pb-safe">
+        <div className="p-4 min-h-screen bg-transparent pb-24 animate-fade-in pb-safe">
             <div className="mb-4 flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                     <h1 className="text-xl font-black text-gray-900 dark:text-white font-display uppercase tracking-tight">Order Logs</h1>
@@ -547,7 +547,7 @@ export const AddProduct: React.FC = () => {
     };
 
     return (
-        <div className="p-4 min-h-screen bg-gray-50 dark:bg-darkBg pb-safe animate-fade-in">
+        <div className="p-4 min-h-screen bg-transparent pb-safe animate-fade-in">
             <div className="flex items-center mb-6">
                 <button onClick={() => navigate(-1)} className="mr-4 w-10 h-10 bg-white dark:bg-darkSurface dark:text-white rounded-full shadow-sm flex items-center justify-center transition-all border border-gray-100 dark:border-gray-800"><i className="fa-solid fa-arrow-left"></i></button>
                 <h1 className="text-xl font-black text-gray-900 dark:text-white font-display uppercase">List New Item</h1>
@@ -574,7 +574,7 @@ export const EditProduct: React.FC = () => {
     };
 
     return (
-        <div className="p-4 min-h-screen bg-gray-50 dark:bg-darkBg pb-safe animate-fade-in">
+        <div className="p-4 min-h-screen bg-transparent pb-safe animate-fade-in">
             <div className="flex items-center mb-6">
                 <button onClick={() => navigate(-1)} className="mr-4 w-10 h-10 bg-white dark:bg-darkSurface dark:text-white rounded-full shadow-sm flex items-center justify-center transition-all border border-gray-100 dark:border-gray-800"><i className="fa-solid fa-arrow-left"></i></button>
                 <h1 className="text-xl font-black text-gray-900 dark:text-white font-display uppercase">Update Listing</h1>
@@ -616,7 +616,7 @@ export const VendorOnboarding: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-darkBg p-8 flex flex-col justify-center max-w-md mx-auto animate-slide-up">
+        <div className="min-h-screen bg-transparent p-8 flex flex-col justify-center max-w-md mx-auto animate-slide-up">
             <div className="text-center mb-8">
                 <div onClick={() => fileRef.current?.click()} className="w-32 h-32 bg-gray-50 dark:bg-darkSurface rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400 dark:text-gray-500 text-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 cursor-pointer overflow-hidden relative group transition-all shadow-soft">
                     {avatarUrl ? <img src={avatarUrl} className="w-full h-full object-cover" /> : <div className="flex flex-col items-center gap-2 p-4 text-center"><i className={`fa-solid ${uploading ? 'fa-spinner fa-spin' : 'fa-camera'}`}></i><span className="text-[10px] font-bold uppercase">Shop Photo</span></div>}

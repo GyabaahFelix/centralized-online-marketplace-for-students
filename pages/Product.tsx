@@ -194,7 +194,7 @@ export const StorePage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in">
+        <div className="min-h-screen bg-transparent pb-24 animate-fade-in">
             <div className="relative h-[420px] w-full overflow-hidden border-b border-gray-100 dark:border-gray-800">
                 <div ref={mapRef} className="absolute inset-0 z-0 h-full w-full bg-gray-200 dark:bg-gray-800" />
                 <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/30 via-black/10 to-transparent pointer-events-none z-10" />
@@ -432,7 +432,7 @@ export const ProductDetail: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white dark:bg-darkBg animate-fade-in pb-32">
+        <div className="min-h-screen bg-transparent animate-fade-in pb-32">
             <div className="max-w-7xl mx-auto px-4 lg:px-8 pt-8">
                 {/* Breadcrumbs */}
                 <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">
@@ -717,8 +717,8 @@ export const Cart: React.FC = () => {
     const isEmpty = cart.length === 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-darkBg pb-32 animate-fade-in max-w-5xl mx-auto">
-            <div className="bg-white dark:bg-darkSurface p-4 shadow-sm sticky top-0 z-30 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+        <div className="min-h-screen bg-transparent pb-32 animate-fade-in max-w-5xl mx-auto">
+            <div className="bg-white/80 dark:bg-darkSurface/80 backdrop-blur-md p-4 shadow-sm sticky top-0 z-30 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-3">
                     <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white transition-colors"><i className="fa-solid fa-arrow-left"></i></button>
                     <h1 className="text-xl font-bold font-display dark:text-white">Your Cart</h1>
@@ -915,8 +915,8 @@ export const Checkout: React.FC = () => {
     if (cart.length === 0) return <Navigate to="/buyer/cart" replace />;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-darkBg pb-32 animate-fade-in max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-darkSurface p-4 shadow-sm sticky top-0 z-30 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+        <div className="min-h-screen bg-transparent pb-32 animate-fade-in max-w-2xl mx-auto">
+            <div className="bg-white/80 dark:bg-darkSurface/80 backdrop-blur-md p-4 shadow-sm sticky top-0 z-30 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
                 <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white transition-colors"><i className="fa-solid fa-arrow-left"></i></button>
                 <h1 className="text-xl font-bold font-display dark:text-white">Checkout</h1>
             </div>

@@ -200,7 +200,7 @@ export const DeliveryDashboard: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in pb-safe">
+        <div className="min-h-screen bg-transparent pb-24 animate-fade-in pb-safe">
             {/* Header */}
             <div className={`p-6 text-white rounded-b-3xl shadow-lg mb-6 sticky top-0 z-10 transition-colors duration-500 ${isOnline ? 'bg-primary' : 'bg-gray-800 dark:bg-darkSurface'}`}>
                 <div className="flex justify-between items-center mb-4">

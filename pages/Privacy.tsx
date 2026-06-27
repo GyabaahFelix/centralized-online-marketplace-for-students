@@ -21,9 +21,9 @@ export const PrivacyPage: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-darkBg pb-24 animate-fade-in font-sans">
+        <div className="min-h-screen bg-transparent pb-24 animate-fade-in font-sans">
             {/* Header */}
-            <div className="bg-white dark:bg-darkSurface p-4 shadow-sm sticky top-0 z-30 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
+            <div className="bg-white/80 dark:bg-darkSurface/80 backdrop-blur-md p-4 shadow-sm sticky top-0 z-30 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800">
                 <button onClick={() => navigate(-1)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white transition-colors">
                     <i className="fa-solid fa-arrow-left"></i>
                 </button>

@@ -109,7 +109,7 @@ export const AdminDashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background dark:bg-darkBg flex flex-col lg:flex-row transition-colors duration-300">
+    <div className="min-h-screen bg-transparent flex flex-col lg:flex-row transition-colors duration-300">
         
         {/* Mobile Header */}
         <div className="lg:hidden bg-gray-900 dark:bg-darkSurface text-white p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">

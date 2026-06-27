@@ -318,11 +318,11 @@ export const SearchPage: React.FC = () => {
       </div>
 
       {/* Viewport Content */}
-      <div className="relative flex-grow h-full bg-white dark:bg-darkBg">
+      <div className="relative flex-grow h-full bg-transparent">
           
           {/* SEARCH LIST MODE */}
           {viewMode === 'list' && (
-              <div className="h-full pt-28 pb-20 overflow-y-auto px-6 hide-scrollbar animate-fade-in bg-gray-50 dark:bg-darkBg">
+              <div className="h-full pt-28 pb-20 overflow-y-auto px-6 hide-scrollbar animate-fade-in bg-transparent">
                 <div className="mb-6 flex justify-between items-center">
                     <h3 className="font-black text-gray-900 dark:text-white text-xl font-display tracking-tight">
                         {approvedProducts.length} Results
